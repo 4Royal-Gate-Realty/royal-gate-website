@@ -33,9 +33,10 @@
             transform: scale(1.2);
             transform-origin: center;
         }
-        video {
+        .video-frame {
             width: 100%;
             height: auto;
+            aspect-ratio: 16/9;
             border-radius: 12px;
         }
         .royal-gold {
@@ -44,7 +45,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-         {
+        @media print {
             body { font-size: 12pt; }
             .no-print { display: none; }
         }
@@ -78,16 +79,14 @@
                     </h2>
                     
                     <div class="video-container max-w-4xl mx-auto" onclick="playVideo()">
-                        <video id="mainVideo" 
-                               class="w-full rounded-lg shadow-lg" 
-                               controls 
-                               playsinline 
-                               webkit-playsinline
-                               preload="metadata"
-                               style="display: none;">
-                            <source src="https://gensparkstorageprodwest.blob.core.windows.net/web-drive/1498eb31-0147-4ad5-aed1-d12972c78e8f/5fcd115c-b6fc-42a9-ae8e-3ac75923a6a0?se=2025-07-04T23%3A18%3A13Z&sp=r&sv=2025-05-05&sr=b&rscd=attachment%3B%20filename%3D%22royal_gate_optimized_small.mp4%22&sig=L05snXHzSx09gSekOkunzyq2wt5bT9%2Bi%2BEhwrDSOBQw%3D" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
+                        <iframe id="youtubeFrame" 
+                                class="video-frame rounded-lg shadow-lg" 
+                                src="https://www.youtube.com/embed/_7lbxgEOXVQ?enablejsapi=1&rel=0&modestbranding=1&fs=1&iv_load_policy=3&showinfo=0&controls=1&autoplay=0&end=0"
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen
+                                style="display: none;">
+                        </iframe>
                         
                         <div id="videoThumbnail" class="relative">
                             <img src="https://page1.genspark.site/v1/base64_upload/67e1bbd54743e9fe3c8c1fe769743828" 
@@ -264,19 +263,50 @@
         </footer>
     </div>
 
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
+        let player;
+        let isPlayerReady = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtubeFrame', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            isPlayerReady = true;
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.ENDED) {
+                const iframe = document.getElementById('youtubeFrame');
+                const thumbnail = document.getElementById('videoThumbnail');
+                
+                iframe.style.display = 'none';
+                thumbnail.style.display = 'block';
+                
+                // Reset the iframe to prevent suggestions
+                player.stopVideo();
+            }
+        }
+
         function playVideo() {
-            const video = document.getElementById('mainVideo');
+            const iframe = document.getElementById('youtubeFrame');
             const thumbnail = document.getElementById('videoThumbnail');
             
             thumbnail.style.display = 'none';
-            video.style.display = 'block';
-            video.play();
+            iframe.style.display = 'block';
             
-            video.addEventListener('ended', function() {
-                video.style.display = 'none';
-                thumbnail.style.display = 'block';
-            });
+            if (isPlayerReady) {
+                player.playVideo();
+            } else {
+                // Fallback for when API isn't ready
+                iframe.src = iframe.src + '&autoplay=1';
+            }
         }
 
         // Mobile optimization
@@ -290,12 +320,3 @@
     </script>
 </body>
 </html>
-    <script id="html_badge_script1">
-        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDmOloWmB%2FZceR9T73wDOyqEidme%2Biu1X4eCVZ%2BWLxzUlB%2B2ChbFaqOnOlsYPh8NL8eTK4EXKN0VzwcnR9ACVT0X7JhG%2B2bctojUAy8iEtCS0jnBZ1ywzDagUydAsR4w10A8XzyUVVJUMrX4bz%2FU5cFrgrkn1%2FGf3Fz66KW%2FiW3KTM3JfUtmVQY7kpQc8%2BfcPlTkdWftSZ5QCku8j3ouydNGe2Gp4hF%2BvRsjz7CL11mx0MW7jqzJrA%2FdadshnttqgLgO9PK1PT1ozFsg5J0NypYs9qbgdg1ABbDFs%2FAGEJJBnrtoYnkiQE7knYXoxExwygnYyUWHy1bzLInn2uKj5JhPohabg6hr%2BlZyUUmqOtpVsa92SJy8cdy6hb7nkziHMsbf0gYv57%2FiexrEfEk8WYiQtBs8E6o0NztXgI61cPicragFyt%2FVnGKSIz7CMFGJW%2F%2B1IHwNnJNJoIQT6gZ%2F8ir%2FqvXP8sDUX%2F1V1WCsmGh6lkFrvr5aguFvWaS60jkFOqAaCcP9ciizFzMr%2F0chLhWc%3D";
-        window.__genspark_locale = "en-US";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDmOloWmB/ZceR9T73wDOyqEidme+iu1X4eCVZ+WLxzUlB+2ChbFaqOnOlsYPh8NL8eTK4EXKN0VzwcnR9ACVT0X7JhG+2bctojUAy8iEtCS0jnBZ1ywzDagUydAsR4w10A8XzyUVVJUMrX4bz/U5cFrgrkn1/Gf3Fz66KW/iW3KTM3JfUtmVQY7kpQc8+fcPlTkdWftSZ5QCku8j3ouydNGe2Gp4hF+vRsjz7CL11mx0MW7jqzJrA/dadshnttqgLgO9PK1PT1ozFsg5J0NypYs9qbgdg1ABbDFs/AGEJJBnrtoYnkiQE7knYXoxExwygnYyUWHy1bzLInn2uKj5JhPohabg6hr+lZyUUmqOtpVsa92SJy8cdy6hb7nkziHMsbf0gYv57/iexrEfEk8WYiQtBs8E6o0NztXgI61cPicragFyt/VnGKSIz7CMFGJW/+1IHwNnJNJoIQT6gZ/8ir/qvXP8sDUX/1V1WCsmGh6lkFrvr5aguFvWaS60jkFOqAaCcP9ciizFzMr/0chLhWc=";
-    </script>
-    
-    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
-    
